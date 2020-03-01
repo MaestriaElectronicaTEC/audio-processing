@@ -20,8 +20,8 @@ def _FMPD(N, k, signal):
 
     # summation
     for i in range(N - k):
-        if i > 0:
-            res.append( C * abs(signal[i] - signal[i + 1]) )
+        if i > 0 and i < (N - k):
+            res.append( C * abs(signal[i] - signal[i + k]) )
 
     return res
 
@@ -70,7 +70,7 @@ def plot_signal(filename, t1, t2):
     # plot the signal
     _plot_signal(s, fm, t1, t2)
 
-def plot_fmpd(filename, k, t1, t2):
+def plot_fmpd(filename, k, t1, t2, A1, A2):
     # load the WAV file
     (fm, s) = _openWavFile(filename)
 
@@ -78,7 +78,7 @@ def plot_fmpd(filename, k, t1, t2):
     fmpd = _FMPD(len(s), k, s)
 
     # plot FMPD
-    _plot_signal(fmpd, fm, t1, t2, 0, 0.000021)
+    _plot_signal(fmpd, fm, t1, t2, A1, A2)
 
 def plot_spectrum(filename):
     # load the WAV file
@@ -112,6 +112,8 @@ def cmdline(argv):
     p.add_argument(     '--k',                  help='FMPD factor', type=int, default=1)
     p.add_argument(     '--t1',                 help='Start time (ms) to plot', type=int, default=200)
     p.add_argument(     '--t2',                 help='End time (ms) to plot', type=int, default=300)
+    p.add_argument(     '--A1',                 help='Low amplitude', type=float, default=0)
+    p.add_argument(     '--A2',                 help='Hight amplitude', type=float, default=0.000041)
 
     p = add_command(    'plot_spectrum',        'Plot of the audio signal spectrum')
     p.add_argument(     '--filename',           help='Path of the WAV file', default='')
