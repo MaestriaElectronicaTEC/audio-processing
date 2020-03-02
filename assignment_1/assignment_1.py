@@ -75,7 +75,8 @@ def plot_fmpd(filename, k, t1, t2, A1, A2):
     (fm, s) = _openWavFile(filename)
 
     # calculate the FMPD
-    fmpd = _FMPD(len(s), k, s)
+    k = (k*fm) / 1000
+    fmpd = _FMPD(len(s), int(k), s)
 
     # plot FMPD
     _plot_signal(fmpd, fm, t1, t2, A1, A2)
@@ -109,7 +110,7 @@ def cmdline(argv):
 
     p = add_command(    'plot_fmpd',            'Plot of the audio signal FMPD')
     p.add_argument(     '--filename',           help='Path of the WAV file', default='')
-    p.add_argument(     '--k',                  help='FMPD factor', type=int, default=1)
+    p.add_argument(     '--k',                  help='FMPD factor', type=float, default=1.0)
     p.add_argument(     '--t1',                 help='Start time (ms) to plot', type=int, default=200)
     p.add_argument(     '--t2',                 help='End time (ms) to plot', type=int, default=300)
     p.add_argument(     '--A1',                 help='Low amplitude', type=float, default=0)
