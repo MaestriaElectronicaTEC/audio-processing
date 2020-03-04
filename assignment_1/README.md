@@ -5,7 +5,7 @@ Here is the implementation corresponding to the first assignment for the Audio P
  - *plot_fmpd*: Plot the magnitude diference of a signal.
  - *plot_spectrum*: Plot the spectrum and the distance to the cochlea of an audio signal.
 
-`
+```
 $ python assignment_1.py --help
 usage: assignment_1.py [-h] {plot_signal,plot_fmpd,plot_spectrum} ...
 
@@ -21,9 +21,9 @@ optional arguments:
   -h, --help            show this help message and exit
 
 Type "assignment_1.py <command> -h" for more information.
-`
+```
 
-`
+```
 $ python assignment_1.py plot_signal --help
 usage: assignment_1.py plot_signal [-h] [--filename FILENAME] [--t1 T1]
                                    [--t2 T2]
@@ -35,9 +35,9 @@ optional arguments:
   --filename FILENAME  Path of the WAV file
   --t1 T1              Start time (ms) to plot
   --t2 T2              End time (ms) to plot
-`
+```
 
-`
+```
 $ python assignment_1.py plot_fmpd --help
 usage: assignment_1.py plot_fmpd [-h] [--filename FILENAME] [--k K] [--t1 T1]
                                  [--t2 T2] [--A1 A1] [--A2 A2]
@@ -52,9 +52,9 @@ optional arguments:
   --t2 T2              End time (ms) to plot
   --A1 A1              Low amplitude
   --A2 A2              Hight amplitude
-`
+```
 
-`
+```
 $ python assignment_1.py plot_spectrum --help
 usage: assignment_1.py plot_spectrum [-h] [--filename FILENAME] [--t1 T1]
                                      [--t2 T2]
@@ -66,4 +66,4 @@ optional arguments:
   --filename FILENAME  Path of the WAV file
   --t1 T1              Start time (ms) to plot
   --t2 T2              End time (ms) to plot
-`
+```
