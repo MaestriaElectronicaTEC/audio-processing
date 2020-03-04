@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from numpy import iinfo, arange, reshape, interp , linspace , log2 , sqrt
+from numpy import iinfo, arange, reshape, interp , linspace , log2 , sqrt, hamming, ones
 from scipy.io.wavfile import read
 from matplotlib.pyplot import xlabel, ylabel, xlim, ylim, figure, plot, show
 from matplotlib.mlab import specgram
@@ -13,6 +13,22 @@ def _openWavFile(filename):
     s = s / iinfo(s.dtype).max
     return (fm, s)
 
+def _applyWindow(signal, fm, t1, t2, type='hamming'):
+    n1 = int((t1*fm) / 1000)
+    n2 = int((t2*fm) / 1000)
+    
+    window = None
+    if (type == 'square'):
+        window = ones(n2 - n1)
+    elif (type == 'hamming'):
+        window = hamming(n2 - n1)
+
+    s = signal[n1:n2]
+    s = s * window
+
+    return s
+
+
 def _FMPD(N, k, signal):
     # intial variables
     C = 1 / (N - k)
@@ -20,8 +36,7 @@ def _FMPD(N, k, signal):
 
     # summation
     for i in range(N - k):
-        if i > 0 and i < (N - k):
-            res.append( C * abs(signal[i] - signal[i + k]) )
+        res.append( C * abs(signal[i] - signal[i + k]) )
 
     return res
 
@@ -73,17 +88,19 @@ def plot_signal(filename, t1, t2):
 def plot_fmpd(filename, k, t1, t2, A1, A2):
     # load the WAV file
     (fm, s) = _openWavFile(filename)
+    s = _applyWindow(s, fm, t1, t2, 'square')
 
     # calculate the FMPD
     k = (k*fm) / 1000
     fmpd = _FMPD(len(s), int(k), s)
 
     # plot FMPD
-    _plot_signal(fmpd, fm, t1, t2, A1, A2)
+    _plot_signal(fmpd, fm, 0, t2 - t1, A1, A2)
 
-def plot_spectrum(filename):
+def plot_spectrum(filename, t1, t2):
     # load the WAV file
     (fm, s) = _openWavFile(filename)
+    s = _applyWindow(s, fm, t1, t2)
 
     # plot the signal spectrum
     _plot_spectrum(s, fm)
@@ -114,10 +131,12 @@ def cmdline(argv):
     p.add_argument(     '--t1',                 help='Start time (ms) to plot', type=int, default=200)
     p.add_argument(     '--t2',                 help='End time (ms) to plot', type=int, default=300)
     p.add_argument(     '--A1',                 help='Low amplitude', type=float, default=0)
-    p.add_argument(     '--A2',                 help='Hight amplitude', type=float, default=0.000041)
+    p.add_argument(     '--A2',                 help='Hight amplitude', type=float, default=0.005)
 
     p = add_command(    'plot_spectrum',        'Plot of the audio signal spectrum')
     p.add_argument(     '--filename',           help='Path of the WAV file', default='')
+    p.add_argument(     '--t1',                 help='Start time (ms) to plot', type=int, default=200)
+    p.add_argument(     '--t2',                 help='End time (ms) to plot', type=int, default=300)
 
     args = parser.parse_args(argv[1:] if len(argv) > 1 else ['-h'])
     func = globals()[args.command]
