@@ -131,7 +131,7 @@ def cmdline(argv):
     p.add_argument(     '--t1',                 help='Start time (ms) to plot', type=int, default=200)
     p.add_argument(     '--t2',                 help='End time (ms) to plot', type=int, default=300)
     p.add_argument(     '--A1',                 help='Low amplitude', type=float, default=0)
-    p.add_argument(     '--A2',                 help='Hight amplitude', type=float, default=0.005)
+    p.add_argument(     '--A2',                 help='Hight amplitude', type=float, default=0.001)
 
     p = add_command(    'plot_spectrum',        'Plot of the audio signal spectrum')
     p.add_argument(     '--filename',           help='Path of the WAV file', default='')
