@@ -24,22 +24,25 @@ def _resample_size(s, fm, fs):
     N_new = int(T_old/T_new) * len(s)
     return N_old, N_new
 
-def _plot(title, s1, s2, s3):
-    plt.subplot(3,1,1)
+def _plot(title, s, fm, t1=185, t2=200, A1=-0.5, A2=0.5):
+    # initial variables
+    dt = 1/fm
+    N = len(s)
+    t = np.arange(N)*dt*1000
+
+    plt.subplot(2,1,1)
     plt.title(title)
-    plt.plot(s1,'g')
+    plt.plot(t, s,'g')
     plt.ylabel('Amplitude')
     plt.xlabel('(a)')
+    plt.ylim( (A1, A2) )
 
-    plt.subplot(3,1,2)
-    plt.plot(s2, 'r')
+    plt.subplot(2,1,2)
+    plt.plot(t, s, 'r')
     plt.ylabel('Amplitude')
     plt.xlabel('(b)')
-
-    plt.subplot(3,1,3)
-    plt.plot(s3, color="purple")
-    plt.ylabel('Amplitude')
-    plt.xlabel('(c)')
+    plt.xlim( (t1, t2) )
+    plt.ylim( (A1, A2) )
 
     plt.subplots_adjust(hspace=1)
     plt.rc('font', size=15)
@@ -59,7 +62,7 @@ def _filter(s, fm):
     s = filtfilt(b, a, s)
     return s
 
-def _modulate(s, f, fm, fs):
+def _modulate(s, f, fm, fs, t1, t2):
     # resample
     _, N_new = _resample_size(s, fm, fs)
     s = resample(s, N_new)
@@ -72,11 +75,12 @@ def _modulate(s, f, fm, fs):
     product = carrier * s
 
     # plot
-    _plot('Modulation', s, carrier, product)
+    _plot('Original signal', s, fs, t1, t2)
+    _plot('Modulated signal', product, fs, t1, t2)
     
     return product
 
-def _demodulate(s, f, fm, fs):
+def _demodulate(s, f, fm, fs, t1, t2):
     
     N_old, N_new = _resample_size(s, fm, fs)
     factor = int(N_new / N_old)
@@ -95,7 +99,7 @@ def _demodulate(s, f, fm, fs):
     original = resample(original, N_new)
 
     # plot
-    _plot('Demodulation', s, carrier, original)
+    _plot('Reconstructed signal', original, fm, t1, t2)
 
     # Amplify the signal
     original = 10*original
@@ -104,9 +108,9 @@ def _demodulate(s, f, fm, fs):
 
 #----------------------------------------------------------------------------
 
-def impulse_response(hfilename, sfilename, outputfile):
+def impulse_response(hfilename, sfilename, outputfile, t1, t2):
     # load the impulse response
-    _, h = _openWavFile(hfilename)
+    fh, h = _openWavFile(hfilename)
 
     # load the voice
     fv, v = _openWavFile(sfilename)
@@ -114,12 +118,17 @@ def impulse_response(hfilename, sfilename, outputfile):
     # apply the impulse response
     y, zf = lfilter(h, 1, v, zi=zeros(len(h) - 1))
     y = append(y, zf)
-    y = (y - np.min(y))/np.ptp(y)
+    y = ((y - np.min(y)) / np.ptp(y)) - 0.5
+
+    # plot
+    _plot('Impuse response', h, fh, 0, 50, -1, 1)
+    _plot('Voice signal', v, fv, t1, t2)
+    _plot('Voice with impulse response', y, fv, t1, t2, -0.6, 0.6)
 
     # save wav file
     write(outputfile, fv, y)
 
-def amplitude_modulation(filename, outputfile, modulate, demodulate, f, fs):
+def amplitude_modulation(filename, outputfile, modulate, demodulate, f, fs, t1, t2):
     # load signal
     fm, s = _openWavFile(filename)
 
@@ -129,11 +138,11 @@ def amplitude_modulation(filename, outputfile, modulate, demodulate, f, fs):
 
     # modulation
     if (modulate):
-        s = _modulate(s, f, fm, fs)
+        s = _modulate(s, f, fm, fs, t1, t2)
 
     # demodulation
     if (demodulate):
-        s = _demodulate(s, f, fm, fs)
+        s = _demodulate(s, f, fm, fs, t1, t2)
 
     # save WAV
     _writeWavFile(outputfile, s, fm)
@@ -145,7 +154,7 @@ def cmdline(argv):
     prog = argv[0]
     parser = argparse.ArgumentParser(
         prog        = prog,
-        description = 'Assignment 1 of the Audio Processing course.',
+        description = 'Assignment 2 of the Audio Processing course.',
         epilog      = 'Type "%s <command> -h" for more information.' % prog)
 
     subparsers = parser.add_subparsers(dest='command')
@@ -158,6 +167,8 @@ def cmdline(argv):
     p.add_argument(     '--hfilename',          help='Path of the WAV file for the impulse response', default='')
     p.add_argument(     '--sfilename',          help='Path of the WAV file for the voice', default='')
     p.add_argument(     '--outputfile',         help='File name of the generated WAV file', default='')
+    p.add_argument(     '--t1',                 help='Start time (ms)', type=float, default=100)
+    p.add_argument(     '--t2',                 help='End time (ms)', type=float, default=200)
 
     p = add_command(    'amplitude_modulation', 'Amplitude modulation of a signal')
     p.add_argument(     '--filename',           help='Path of the WAV file', default='')
@@ -166,6 +177,8 @@ def cmdline(argv):
     p.add_argument(     '--demodulate',         help='Apply demodulation', action='store_true')
     p.add_argument(     '--f',                  help='Carrier frequency', type=int, default=870000)
     p.add_argument(     '--fs',                 help='Resample frequency', type=int, default=-1)
+    p.add_argument(     '--t1',                 help='Start time (ms)', type=float, default=100)
+    p.add_argument(     '--t2',                 help='End time (ms)', type=float, default=200)
 
     args = parser.parse_args(argv[1:] if len(argv) > 1 else ['-h'])
     func = globals()[args.command]
