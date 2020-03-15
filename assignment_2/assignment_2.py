@@ -34,13 +34,13 @@ def _plot(title, s, fm, t1=185, t2=200, A1=-0.5, A2=0.5):
     plt.title(title)
     plt.plot(t, s,'g')
     plt.ylabel('Amplitude')
-    plt.xlabel('(a)')
+    plt.xlabel('Time (ms)')
     plt.ylim( (A1, A2) )
 
     plt.subplot(2,1,2)
     plt.plot(t, s, 'r')
     plt.ylabel('Amplitude')
-    plt.xlabel('(b)')
+    plt.xlabel('Time (ms)')
     plt.xlim( (t1, t2) )
     plt.ylim( (A1, A2) )
 
