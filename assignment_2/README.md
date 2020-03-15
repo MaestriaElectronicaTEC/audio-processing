@@ -1,4 +1,4 @@
-# Assignment 1
+# Assignment 2
 
 Here is the implementation corresponding to the second assignment for the Audio Processing course. The *assignment_2.py* script has the following functions:
  - *impulse_response*: Impulse response of a room.
