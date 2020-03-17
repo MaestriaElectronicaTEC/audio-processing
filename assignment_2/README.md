@@ -43,6 +43,11 @@ optional arguments:
   --t2 T2               End time (ms)
 ```
 
+Example:
+```
+python assignment_2.py impulse_response --hfilename sounds/impulse2.wav --sfilename ../assignment_1/sounds/anthem.wav --outputfile testeando.wav --t1 200 --t2 210
+```
+
 ```
 $ python assignment_2.py amplitude_modulation --help
 usage: assignment_2.py amplitude_modulation [-h] [--filename FILENAME]
@@ -64,4 +69,11 @@ optional arguments:
   --fs FS               Resample frequency
   --t1 T1               Start time (ms)
   --t2 T2               End time (ms)
+```
+
+Examples:
+```
+python assignment_2.py amplitude_modulation --filename sounds/2m1.wav --outputfile test.wav --modulate --demodulate --f 870000 --fs 4000000 --t1 185 --t2 186
+
+python assignment_2.py amplitude_modulation --filename sounds/AM870,890,910.wav --outputfile UCR.wav --demodulate --f 870000  --t1 185 --t2 186
 ```
