@@ -23,6 +23,7 @@ optional arguments:
 Type "assignment_3.py <command> -h" for more information.
 ```
 
+## sawtoothWindowAnalysis
 ```
 $ python assignment_3.py sawtoothWindowAnalysis --help
 usage: assignment_3.py sawtoothWindowAnalysis [-h] [--f F] [--M M]
@@ -37,6 +38,7 @@ optional arguments:
   --winType WINTYPE  Window type: 0 - Rectangular, 1 - Hanning, 2 - Hamming
 ```
 
+## audioWindowAnalysis
 ```
 $ python assignment_3.py audioWindowAnalysis --help
 usage: assignment_3.py audioWindowAnalysis [-h] [--filename FILENAME] [--M M]
