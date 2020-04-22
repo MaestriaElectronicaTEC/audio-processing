@@ -25,13 +25,15 @@ def _generateSawtooth(f, fs, M=10):
     dt = 1/fs
     N = int(M/dt)
     t = np.arange(N)*dt
-    s = sawtooth(2 * np.pi * f * t)  + 1
+    s = np.pi*sawtooth(2 * np.pi * f * t + np.pi)
     plt.plot(t, s)
+    plt.xlabel('time [s]')
+    plt.ylabel('Amplitude')
     plt.show()
     return s
 
 def _generateWindow(fs, M, winType=RECTANGULAR):
-    winSize = int(M)
+    winSize = int((M/1000) * fs)
     if (winType is RECTANGULAR):
         print('Rectangular window')
         w = boxcar(winSize)
@@ -45,18 +47,38 @@ def _generateWindow(fs, M, winType=RECTANGULAR):
         w = np.hanning(winSize)
         return w
 
-def _shortTimeFourierTransform(s, w, fs):
-    #f, Pxx_spec = welch(s, fs, nperseg=len(w), window=w, scaling='spectrum')
-    f, Pxx_spec = welch(s, fs, nperseg=len(w), window=w)
-    plt.plot(f, Pxx_spec / np.amax(Pxx_spec))
+def _shortTimeFourierTransform_1(s, w, f0, fs):
+    plt.magnitude_spectrum(s[:len(w)], Fs=fs, window=w)
+    plt.axvline(x= f0, color = 'r', linestyle='--')
+    plt.text(f0 + 4, 0.9, 'f0')
+    plt.axvline(x= 2*f0, color = 'g', linestyle='--')
+    plt.text(2*f0 + 4, 0.9, '2f0')
+    plt.axvline(x= 3*f0, color = 'y', linestyle='--')
+    plt.text(3*f0 + 4, 0.9, '3f0')
+    plt.axvline(x= 4*f0, color = 'b', linestyle='--')
+    plt.text(4*f0 + 4, 0.9, '4f0')
+    plt.show()
+
+def _shortTimeFourierTransform_2(s, w , f0, fs):
+    f, Pxx_spec = welch(s, fs, nperseg=len(w), window=w, scaling='spectrum')
+    Pxx_spec = Pxx_spec / np.amax(Pxx_spec)
+    plt.plot(f, Pxx_spec)
     plt.xlabel('frequency [Hz]')
-    plt.ylabel('PSD')
+    plt.ylabel('Magnitude (energy)')
+    plt.axvline(x= f0, color = 'r', linestyle='--')
+    plt.text(f0 + 4, 1, 'f0')
+    plt.axvline(x= 2*f0, color = 'g', linestyle='--')
+    plt.text(2*f0 + 4, 1, '2f0')
+    plt.axvline(x= 3*f0, color = 'y', linestyle='--')
+    plt.text(3*f0 + 4, 1, '3f0')
+    plt.axvline(x= 4*f0, color = 'b', linestyle='--')
+    plt.text(4*f0 + 4, 1, '4f0')
     plt.show()
 
 #----------------------------------------------------------------------------
 
 def sawtoothWindowAnalysis(f, M, winType=RECTANGULAR):
-    fs = 44100
+    fs = 16000
     # get the sawtooth signal
     s = _generateSawtooth(f, fs)
 
@@ -64,9 +86,9 @@ def sawtoothWindowAnalysis(f, M, winType=RECTANGULAR):
     w = _generateWindow(fs, M, winType)
 
     # compute the short time Fourier transform
-    _shortTimeFourierTransform(s, w, fs)
+    _shortTimeFourierTransform_1(s, w, f, fs)
 
-def audioWindowAnalysis(filename, M, winType=RECTANGULAR):
+def audioWindowAnalysis(filename, f, M, winType=RECTANGULAR):
     # load the wav file
     fs, s = _openWavFile(filename)
 
@@ -74,7 +96,7 @@ def audioWindowAnalysis(filename, M, winType=RECTANGULAR):
     w = _generateWindow(fs, M, winType)
 
     # compute the short time Fourier transform
-    _shortTimeFourierTransform(s, w, fs)
+    _shortTimeFourierTransform_2(s, w, f, fs)
 
 #----------------------------------------------------------------------------
 
@@ -98,6 +120,7 @@ def cmdline(argv):
 
     p = add_command(    'audioWindowAnalysis',          'Window analysis of a WAV file')
     p.add_argument(     '--filename',                   help='Path of the WAV file', default='')
+    p.add_argument(     '--f',                          help='Frecuency of the Sawthooth signal', type=float, default=5)
     p.add_argument(     '--M',                          help='Lenght in milliseconds of the window', type=float, default=100)
     p.add_argument(     '--winType',                    help='Window type: 0 - Rectangular, 1 - Hanning, 2 - Hamming', type=int, default=RECTANGULAR)
 
