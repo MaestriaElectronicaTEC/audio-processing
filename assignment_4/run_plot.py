@@ -10,6 +10,7 @@ from math import log2, pi
 from a1 import a1
 from a2 import a2
 from a3 import a3
+from a4 import a4
 
 from matplotlib.pyplot import gca, imshow, xlabel, ylabel, plot
 
@@ -78,6 +79,18 @@ def SHS2():
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
     plot_winner_score(t, s)
+    #TODO test with white noise
+
+def SHR():
+    fm = 8000 # frecuencia de muestreo
+    dt = 1/fm # tiempo entre muestras
+    t = arange(0,1,dt) # vector de tiempos
+    x = sawtooth(2*pi*200*t) # senal de ejemplo
+    #x = randn(round(fm/10)) # senal de ejemplo
+    (p,t,s,pc,S) = a4(x,fm) # invoca a HPS
+
+    plot_score_matrix(S, pc, t)
+    plot_scores(S, pc)
 
 #----------------------------------------------------------------------------
 
@@ -97,6 +110,7 @@ def cmdline(argv):
     p = add_command(    'HPS',       'Harmonic Product Spectrum')
     p = add_command(    'SHS',       'Subharmonic summation')
     p = add_command(    'SHS2',      'Subharmonic summation with weighing')
+    p = add_command(    'SHR',       'Subharmonic-to-harmonic ratio')
 
     args = parser.parse_args(argv[1:] if len(argv) > 1 else ['-h'])
     func = globals()[args.command]
