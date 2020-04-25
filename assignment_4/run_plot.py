@@ -2,7 +2,7 @@ import sys
 import argparse
 import matplotlib.pyplot as plt
 
-from numpy import amax, argmax, arange, concatenate, interp, prod, zeros, around
+from numpy import amax, argmax, arange, concatenate, interp, prod, zeros, around, mean
 from scipy.signal import hann, sawtooth
 from math import log2, pi
 
@@ -32,6 +32,12 @@ def plot_scores(S, pc):
     plot(pc, S[:, round(S.shape[1]/2)])
     ylabel('Score')
     xlabel('Pitch (Hz)')
+    plt.show()
+
+def plot_winner_score(t, s):
+    plot(1000*t, s)
+    ylabel('Winner score')
+    xlabel('Time (s)')
     plt.show()
 
 #----------------------------------------------------------------------------
@@ -66,8 +72,12 @@ def SHS2():
     #x = randn(round(fm/10)) # senal de ejemplo
     (p,t,s,pc,S) = a3(x,fm) # invoca a HPS
 
+    m = mean(s)
+    print('mean: ' + str(m))
+
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
+    plot_winner_score(t, s)
 
 #----------------------------------------------------------------------------
 
