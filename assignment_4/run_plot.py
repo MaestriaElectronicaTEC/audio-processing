@@ -9,6 +9,7 @@ from math import log2, pi
 # Algoirihtms of pitch detection
 from a1 import a1
 from a2 import a2
+from a3 import a3
 
 from matplotlib.pyplot import gca, imshow, xlabel, ylabel, plot
 
@@ -57,6 +58,17 @@ def SHS():
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
+def SHS2():
+    fm = 8000 # frecuencia de muestreo
+    dt = 1/fm # tiempo entre muestras
+    t = arange(0,1,dt) # vector de tiempos
+    x = sawtooth(2*pi*200*t) # senal de ejemplo
+    #x = randn(round(fm/10)) # senal de ejemplo
+    (p,t,s,pc,S) = a3(x,fm) # invoca a HPS
+
+    plot_score_matrix(S, pc, t)
+    plot_scores(S, pc)
+
 #----------------------------------------------------------------------------
 
 def cmdline(argv):
@@ -74,6 +86,7 @@ def cmdline(argv):
 
     p = add_command(    'HPS',       'Harmonic Product Spectrum')
     p = add_command(    'SHS',       'Subharmonic summation')
+    p = add_command(    'SHS2',      'Subharmonic summation with weighing')
 
     args = parser.parse_args(argv[1:] if len(argv) > 1 else ['-h'])
     func = globals()[args.command]
