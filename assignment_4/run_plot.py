@@ -2,8 +2,10 @@ import sys
 import argparse
 import matplotlib.pyplot as plt
 
-from numpy import amax, argmax, arange, concatenate, interp, prod, zeros, around, mean
+from numpy import amax, argmax, arange, concatenate, interp, prod, zeros, around, mean, cos, iinfo
+from numpy.random import normal
 from scipy.signal import hann, sawtooth
+from scipy.io.wavfile import read, write
 from math import log2, pi
 
 # Algoirihtms of pitch detection
@@ -44,37 +46,82 @@ def plot_winner_score(t, s):
     xlabel('Time (s)')
     plt.show()
 
+def gen_sawtooth(f):
+    fm = 10000
+    Tm = 1/fm
+    t = arange(0, 0.5, Tm)
+    x = 2*pi*sawtooth(2*pi*f*t)
+    #write('sawtooth.wav', fm, x/2)
+    return (t, x, fm)
+
+def gen_tone(f):
+    fm = 10000
+    Tm = 1/fm
+    t = arange(0, 0.5, Tm)
+    x = 2*pi*cos(2*pi*f*t)
+    #write('tone' + str(f) + '.wav', fm, x/2)
+    return (t, x, fm)
+
+def gen_mixed_tones():
+    fm = 10000
+    Tm = 1/fm
+    t = arange(0, 0.5, Tm)
+
+    # 650 Hz
+    f = 650
+    x1 = 2*pi*cos(2*pi*f*t)
+
+    # 950 Hz
+    f = 950
+    x2 = 2*pi*cos(2*pi*f*t)
+
+    # 1250 Hz
+    f = 1250
+    x3 = 2*pi*cos(2*pi*f*t)
+
+    x = x1 + x2 + x3
+
+    return (t, x, fm)
+
+def gen_white_noise():
+    fm = 10000
+    Tm = 1/fm
+    t = arange(0, 0.5, Tm)
+    mean = 0
+    std = 1
+    x = 2*pi*normal(mean, std, size=len(t))
+    return (t, x, fm)
+
+def openWavFile(filename):
+    (fm,s) = read(filename)
+
+    Tm = 1/fm
+    t = arange(0, 1, Tm)
+
+    x = s / iinfo(s.dtype).max
+    return (t, x, fm)
+
 #----------------------------------------------------------------------------
 
 def HPS():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
+    #t, x, fm = gen_sawtooth(200)
+    t, x, fm = gen_tone(200)
     (p,t,s,pc,S) = a1(x,fm) # invoca a HPS
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
 def SHS():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a2(x,fm) # invoca a HPS
+    t, x, fm = gen_tone(200)
+    (p,t,s,pc,S) = a2(x,fm) # invoca a SHS
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
 def SHS2():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a3(x,fm) # invoca a HPS
+    #t, x, fm = gen_tone(200)
+    t, x, fm = gen_white_noise()
+    (p,t,s,pc,S) = a3(x,fm) # invoca a SHS2
 
     m = mean(s)
     print('mean: ' + str(m))
@@ -82,48 +129,38 @@ def SHS2():
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
     plot_winner_score(t, s)
-    #TODO test with white noise
 
 def SHR():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a4(x,fm) # invoca a HPS
+    #t, x, fm = gen_tone(200)
+    #t, x, fm = gen_white_noise()
+    t, x, fm = gen_mixed_tones()
+    (p,t,s,pc,S) = a4(x,fm) # invoca a SHR
+
+    m = mean(s)
+    print('mean: ' + str(m))
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
+    plot_winner_score(t, s)
 
 def AC():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a5(x,fm) # invoca a HPS
+    t, x, fm = gen_mixed_tones()
+    (p,t,s,pc,S) = a5(x,fm) # invoca a Autocorrelation
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
 def AC2():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a6(x,fm) # invoca a HPS
+    t, x, fm = gen_mixed_tones()
+    (p,t,s,pc,S) = a6(x,fm) # invoca a Autocorrelation 2
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
 def AC3():
-    fm = 8000 # frecuencia de muestreo
-    dt = 1/fm # tiempo entre muestras
-    t = arange(0,1,dt) # vector de tiempos
-    x = sawtooth(2*pi*200*t) # senal de ejemplo
-    #x = randn(round(fm/10)) # senal de ejemplo
-    (p,t,s,pc,S) = a7(x,fm) # invoca a HPS
+    #t, x, fm = gen_mixed_tones()
+    t, x, fm = openWavFile('../assignment_1/sounds/anthem.wav')
+    (p,t,s,pc,S) = a7(x,fm) # invoca a Autocorrelation 3
 
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
