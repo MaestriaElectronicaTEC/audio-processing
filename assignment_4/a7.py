@@ -1,10 +1,17 @@
 from math import log2, pi
 from matplotlib.mlab import specgram
-from numpy import amax, argmax, arange, concatenate, interp, sum, zeros, cos
+from numpy import amax, argmax, arange, concatenate, interp, sum, zeros, cos, append
 from numpy.random import randn
 from scipy.signal import hann, sawtooth
 
-def a7(x, fm, plim=None, dt=None, n=None, tw=None, dlog2p=None, s0=None): # subharmonic-to-harmonic ratio
+def f2mm(f):
+    return 5.7*log2(1 + (f/230))
+
+def mm2f(m):
+    return 230*((2**(m/5.7)) - 1)
+
+
+def a7(x, fm, plim=None, dt=None, n=None, tw=None, dlog2p=None, s0=None): # Autocorrelation
     #VARIABLES
     if plim is None: # rango de los candidatos a altura
         plim = [50,800]
@@ -39,10 +46,21 @@ def a7(x, fm, plim=None, dt=None, n=None, tw=None, dlog2p=None, s0=None): # subh
         start = (ws * pc[i]) / (4*fm)
         end = (ws / 2) - 1
         k = arange(start, end+1)
-        scalar = (ws * pc[i]) / (k * fm)
-        scalar = scalar**0.5
-        cosine = cos(2*pi*k*(fm/(ws*pc[i])))
+
         fi = k*(fm / ws)
+        m0 = f2mm(fi[0])
+        mf = f2mm(fi[-1])
+        dm = (mf - m0) / (len(k))
+        ms = arange(m0, mf, dm)
+        if (len(ms) > len(k)):
+            ms = ms[:-2]
+        if (len(ms) < len(k)):
+            ms = append(ms, [ms[-1] + dm])
+        fi = mm2f(ms)
+
+        scalar = pc[i] / fi
+        scalar = scalar**0.5
+        cosine = cos(2*pi*(fi/pc[i]))
 
         A = zeros((len(fi), X.shape[1])) # cree matriz nArmonicas x nVentanas
         for j in range(0, X.shape[1]): # por cada ventana:
