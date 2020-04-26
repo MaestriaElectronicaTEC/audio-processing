@@ -12,6 +12,7 @@ from a2 import a2
 from a3 import a3
 from a4 import a4
 from a5 import a5
+from a6 import a6
 
 from matplotlib.pyplot import gca, imshow, xlabel, ylabel, plot
 
@@ -104,6 +105,17 @@ def AC():
     plot_score_matrix(S, pc, t)
     plot_scores(S, pc)
 
+def AC2():
+    fm = 8000 # frecuencia de muestreo
+    dt = 1/fm # tiempo entre muestras
+    t = arange(0,1,dt) # vector de tiempos
+    x = sawtooth(2*pi*200*t) # senal de ejemplo
+    #x = randn(round(fm/10)) # senal de ejemplo
+    (p,t,s,pc,S) = a6(x,fm) # invoca a HPS
+
+    plot_score_matrix(S, pc, t)
+    plot_scores(S, pc)
+
 #----------------------------------------------------------------------------
 
 def cmdline(argv):
@@ -124,6 +136,7 @@ def cmdline(argv):
     p = add_command(    'SHS2',      'Subharmonic summation with weighing')
     p = add_command(    'SHR',       'Subharmonic-to-harmonic ratio')
     p = add_command(    'AC',        'Autocorrelation')
+    p = add_command(    'AC2',       'Autocorrelation 2')
 
     args = parser.parse_args(argv[1:] if len(argv) > 1 else ['-h'])
     func = globals()[args.command]
