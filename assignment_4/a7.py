@@ -11,14 +11,12 @@ def mm2f(m):
     return 230*((2**(m/5.7)) - 1)
 
 
-def a7(x, fm, plim=None, dt=None, n=None, tw=None, dlog2p=None, s0=None): # Autocorrelation
+def a7(x, fm, plim=None, dt=None, tw=None, dlog2p=None, s0=None): # Autocorrelation with cochlea sampling
     #VARIABLES
     if plim is None: # rango de los candidatos a altura
         plim = [50,800]
     if dt is None: # tiempo entre estimados de altura
         dt = 0.010
-    if n is None: # cantidad de armonicas a analizar
-        n = 7
     if tw is None: # tamano de la ventana (segundos)
         tw = 0.050
     if dlog2p is None: # distancia entre los candidatos (octavas)

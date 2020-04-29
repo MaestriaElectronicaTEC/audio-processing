@@ -96,7 +96,7 @@ def openWavFile(filename):
     (fm,s) = read(filename)
 
     Tm = 1/fm
-    t = arange(0, 1, Tm)
+    t = arange(0, 15, Tm)
 
     x = s / iinfo(s.dtype).max
     return (t, x, fm)
@@ -159,7 +159,7 @@ def AC2():
 
 def AC3():
     #t, x, fm = gen_mixed_tones()
-    t, x, fm = openWavFile('../assignment_1/sounds/anthem.wav')
+    t, x, fm = openWavFile('../assignment_1/sounds/mm1.wav')
     (p,t,s,pc,S) = a7(x,fm) # invoca a Autocorrelation 3
 
     plot_score_matrix(S, pc, t)

@@ -4,14 +4,12 @@ from numpy import amax, argmax, arange, concatenate, interp, sum, zeros, cos
 from numpy.random import randn
 from scipy.signal import hann, sawtooth
 
-def a5(x, fm, plim=None, dt=None, n=None, tw=None, dlog2p=None, s0=None): # subharmonic-to-harmonic ratio
+def a5(x, fm, plim=None, dt=None, tw=None, dlog2p=None, s0=None): # Autocorrelation
     #VARIABLES
     if plim is None: # rango de los candidatos a altura
         plim = [50,800]
     if dt is None: # tiempo entre estimados de altura
         dt = 0.010
-    if n is None: # cantidad de armonicas a analizar
-        n = 7
     if tw is None: # tamano de la ventana (segundos)
         tw = 0.050
     if dlog2p is None: # distancia entre los candidatos (octavas)
