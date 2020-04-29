@@ -1,6 +1,6 @@
 # Assignment 4
 
-Here is the implementation corresponding to the third assignment for the Audio Processing course. The *run_plot.py* script has the following functions:
+Here is the implementation corresponding to the fourth assignment for the Audio Processing course. The *run_plot.py* script has the following functions:
 - *HPS*: Harmonic Product Spectrum
 - *SHS*: Subharmonic summation
 - *SHS2*: Subharmonic summation with weighing
