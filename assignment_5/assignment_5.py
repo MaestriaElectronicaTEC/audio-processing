@@ -15,6 +15,23 @@ from scipy.fftpack import fft, fftfreq
 
 #----------------------------------------------------------------------------
 
+K_A = 1/500
+K_A_WHISPER = 1/500
+
+K_E = 1/2000
+K_WHISPERED_E = 1/1000
+
+K_I = 1/1000
+K_I_WHISPER = 1/500
+
+K_O = 1/450
+K_O_WHISPER = 1/1000
+
+K_U = 1/500
+K_U_WHISPER = 1/500
+
+#----------------------------------------------------------------------------
+
 def loadWAV(filename):
     fm, s = read(filename)
     s = s / iinfo(s.dtype).max # Para que esté en el rango [-1,1], como en Matlab
@@ -28,7 +45,7 @@ def windowing(s, N):
 
 def getACoefficient(fm, s):
     # Calcular coeficientes de prediccion lineal
-    nCoefs = 1*round(fm/1000) # Regla del pulgar: num. de muestras en 1 ms
+    nCoefs = 1*round(fm*K_U) # Regla del pulgar: num. de muestras en 1 ms
     return lpc_ref( s, nCoefs )
 
 def plotFormants(fm, N, s, a):
